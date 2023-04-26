@@ -1,6 +1,7 @@
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { CustomPDFLoader } from '@/utils/customPDFLoader';
+import { CustomTextLoader } from '@/utils/customPDFLoader';
 import { DirectoryLoader } from 'langchain/document_loaders/fs/directory';
 import { Chroma } from 'langchain/vectorstores/chroma';
 import { COLLECTION_NAME } from '@/config/chroma';
@@ -13,6 +14,7 @@ export const run = async () => {
     /*load raw docs from the all files in the directory */
     const directoryLoader = new DirectoryLoader(filePath, {
       '.pdf': (path) => new CustomPDFLoader(path),
+      '.txt': (path) => new CustomTextLoader(path),
     });
 
     // const loader = new PDFLoader(filePath);

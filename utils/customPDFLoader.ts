@@ -2,6 +2,7 @@ import { Document } from 'langchain/document';
 import { readFile } from 'fs/promises';
 import { BaseDocumentLoader } from 'langchain/document_loaders';
 
+
 export abstract class BufferLoader extends BaseDocumentLoader {
   constructor(public filePathOrBlob: string | Blob) {
     super();
@@ -27,6 +28,22 @@ export abstract class BufferLoader extends BaseDocumentLoader {
     return this.parse(buffer, metadata);
   }
 }
+
+export class CustomTextLoader extends BufferLoader {
+  public async parse(
+    raw: Buffer,
+    metadata: Document['metadata'],
+  ): Promise<Document[]> {
+    const content = raw.toString();
+    return [
+      new Document({
+        pageContent: content,
+        metadata: metadata,
+      }),
+    ];
+  }
+}
+
 
 export class CustomPDFLoader extends BufferLoader {
   public async parse(

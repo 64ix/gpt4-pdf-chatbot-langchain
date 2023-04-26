@@ -12,11 +12,12 @@ Standalone question:`;
 const QA_PROMPT = `You are a helpful AI assistant. Use the following pieces of context to answer the question at the end.
 If you don't know the answer, just say you don't know. DO NOT try to make up an answer.
 If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
+You can give advice and recommendations on the context if it is requested, but specify that it is advice.
 
 {context}
 
 Question: {question}
-Helpful answer in markdown:`;
+Helpful answer, in the language of the question, in markdown:`;
 
 export const makeChain = (vectorstore: Chroma) => {
   const model = new OpenAI({
