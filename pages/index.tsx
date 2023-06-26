@@ -265,9 +265,8 @@ export default function Home() {
         </main>
       </div>
       <footer className="m-auto p-4">
-        <a href="">
-          Powered by LangChain. Demo built by Mayo (Twitter: @mayowaoshin).
-          Edited by 64ix .
+        <a href="https://brainsonic.com">
+          Démo créée par Brainsonic.
         </a>
       </footer>
     </>
