@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, use } from 'react';
+import { useRef, useState, useEffect, use, FormEvent } from 'react';
 import Layout from '@/components/layout';
 import styles from '@/styles/Home.module.css';
 import { Message } from '@/types/chat';
@@ -15,13 +15,11 @@ import {
 
 const randomId = Math.random().toString(36);
 console.log('randomId', randomId);
-
-function addTooltipToText(text: string) {
-  var final = text.replace("<insulte>", "<span className={styles.bubble}>");
-  final = final.replace("</insulte>", "<span className={styles.tooltiptext}> Ceci est une insulte provoquée par le syndrome Gille de la Tourette </span></span>");
-  console.log('final', final);
-  return final;
-}
+let prompt = `Tu es une IA créé par Brainsonic qui répond aux questions et discute avec un utilisateur.
+Tu as le SYNDROME DE GILLES DE LA TOURETTE, tu t'interromps très souvent en plein milieu de tes réponses pour dire des mots obscènes, violents et insultants.
+Tu pousses des cris souvent.
+Tu ne t'excuse jamais dans tes réponses.
+`;
 
 export default function Home() {
   const [query, setQuery] = useState<string>('');
@@ -46,6 +44,8 @@ export default function Home() {
 
   const messageListRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const settingsTextAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     textAreaRef.current?.focus();
@@ -77,6 +77,7 @@ export default function Home() {
 
     setLoading(true);
     setQuery('');
+    const preprompt = settings.param1;
 
     try {
       const response = await fetch('/api/chat', {
@@ -87,6 +88,7 @@ export default function Home() {
         body: JSON.stringify({
           question,
           randomId,
+          preprompt,
         }),
       });
       const data = await response.json();
@@ -101,7 +103,7 @@ export default function Home() {
             ...state.messages,
             {
               type: 'apiMessage',
-              message: addTooltipToText(data.response),
+              message: data.response,
             },
           ],
           history: [...state.history, [question, data.text]],
@@ -119,6 +121,13 @@ export default function Home() {
       console.log('error', error);
     }
   }
+  const [settings, setSettings] = useState({
+    // Définis les paramètres du chatbot ici
+    // Initialise les paramètres du chatbot avec des valeurs par défaut
+    param1: prompt,
+
+    // ...
+  });
 
   //prevent empty submissions
   const handleEnter = (e: any) => {
@@ -135,6 +144,7 @@ export default function Home() {
         <h1 className="text-2xl font-bold leading-[1.1] tracking-tighter text-center">
           Parlez à l'IA
         </h1>
+
         <main className={styles.main}>
           <div className={styles.cloud}>
             <div ref={messageListRef} className={styles.messagelist}>
@@ -264,10 +274,33 @@ export default function Home() {
           )}
         </main>
       </div>
+      {isSidebarOpen && (
+        <div className={styles.sidebar}>
+          <h2>Paramètres du Chatbot</h2>
+            {
+              /* Ajoute les champs de formulaire pour les paramètres du chatbot ici */
+              <textarea
+                ref={settingsTextAreaRef}
+                value={settings.param1}
+                onChange={(e) =>
+                  setSettings({ ...settings, param1: e.target.value })
+                }
+              />
+            }
+        </div>
+      )}
+<div className="mx-auto flex flex-col items-center">
+  <button
+    className={styles['options-button']}
+    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+  >
+    {isSidebarOpen ? 'Fermer le panneau' : 'Ouvrir le panneau'}
+  </button>
+</div>
+
+              
       <footer className="m-auto p-4">
-        <a href="https://brainsonic.com">
-          Démo créée par Brainsonic.
-        </a>
+        <a href="https://brainsonic.com">Démo créée par Brainsonic.</a>
       </footer>
     </>
   );

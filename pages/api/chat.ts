@@ -2,14 +2,17 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { makeChain } from '@/utils/makechain';
 
 var clients = new Map();
+var prompts = new Map();
+
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { question, randomId } = req.body;
-  console.log(randomId);
+  const { question, randomId, preprompt } = req.body;
   console.log('question', question);
+  console.log('preprompt', preprompt);
+  console.log('randomId', randomId);
   
   //only accept post requests
   if (req.method !== 'POST') {
@@ -19,9 +22,10 @@ export default async function handler(
   if (!question) {
     return res.status(400).json({ message: 'No question in the request' });
   }
-  if (clients.get(randomId) == undefined) {
-    const chain = makeChain();
+  if (clients.get(randomId) == undefined || preprompt != prompts.get(randomId)) {
+    const chain = makeChain(preprompt);
     clients.set(randomId, chain);
+    prompts.set(randomId, preprompt);
   }
   // OpenAI recommends replacing newlines with spaces for best results
   const sanitizedQuestion = question.trim().replaceAll('\n', ' ');
